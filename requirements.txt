@@ -1,0 +1,6 @@
+numpy
+pandas
+pyairtable
+streamlit
+plotly.graph-objects
+statistics
