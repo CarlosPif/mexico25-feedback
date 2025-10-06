@@ -36,38 +36,3 @@ st.set_page_config(
     layout="wide"
 )
 
-#primero quiero poner un titulo 
-
-st.markdown("""
-<style>
-.outer-container {
-    display: flex;
-    justify-content: center; /* Centra horizontalmente */
-    width: 100%; /* Ocupa todo el ancho disponible */
-}
-.container {
-    display: flex;
-    align-items: center;
-}
-.logo-img {
-    width: 80px;
-    height: 80px;
-    margin-right: 20px;
-}
-.title-text {
-    font-size: 2.5em; /* Tamaño del título */
-    font-weight: bold;
-}
-</style>
-<div class="outer-container">
-<div class="container">
-    <img class="logo-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb_FaT4TLTs0RVC0zxBnYT2pUjrN3JJKIY6Q&s">
-    <h1 class="title-text">Program Feedback<br>México 2025</h1>
-</div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<h4>Here you will find the most relevant feedback for today</h4>
-""",
-unsafe_allow_html=True)
