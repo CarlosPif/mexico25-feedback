@@ -188,7 +188,6 @@ startup = st.selectbox("Select a startup", startups)
 df_team_startup = df_team[df_team["Startup"] == startup]
 
 #--------------------------Parte de business metrics--------------------
-df_em_startup = df_em[df_em["Startup"]]
 
 #=========================Grafico de Arañaaa===========================
 fields_team = fields['team']
