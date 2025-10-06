@@ -104,6 +104,14 @@ for col in expected_fields:
     if col not in df_team.columns:
         df_team[col] = np.nan
 
+for col in fields['team']:
+    if col not in df_team.columns:
+        df_team[col] = np.nan
+    
+for col in fields['individual']:
+    if col not in df_team.columns:
+        df_team[col] = np.nan
+
 labels = {
     "team": [
         "Conflict resolution",
@@ -179,6 +187,9 @@ startup = st.selectbox("Select a startup", startups)
 
 df_team_startup = df_team[df_team["Startup"] == startup]
 
+#--------------------------Parte de business metrics--------------------
+df_em_startup = df_em[df_em["Startup"]]
+
 #=========================Grafico de Arañaaa===========================
 fields_team = fields['team']
 means_team = []
@@ -246,15 +257,15 @@ with st.container(border=True):
 
     for i, founder in enumerate(founders):
         with cols[i]:
-            df_team_startup_founder = df_team_startup[df_team_startup["Founder_str"] == founder].copy()
-            df_team_startup_founder["Openness"] = (
-                df_team_startup_founder["Workstations | Openness (Individual)"].dropna().astype(float).mean() +
-                df_team_startup_founder["Paellas contest | Openness (Individual)"].dropna().astype(float).mean()
+            df_team_founder = df_team[df_team["Founder_str"] == founder].copy()
+            df_team_founder["Openness"] = (
+                df_team_founder["Workstations | Openness (Individual)"].dropna().astype(float).mean() +
+                df_team_founder["Paellas contest | Openness (Individual)"].dropna().astype(float).mean()
             ) / 2
 
-            df_team_startup_founder["Purpose"] = (
-                df_team_startup_founder["Workstations | Purpose (Individual)"].dropna().astype(float).mean() +
-                df_team_startup_founder["1:1's | Purpose (Individual)"].dropna().astype(float).mean()
+            df_team_founder["Purpose"] = (
+                df_team_founder["Workstations | Purpose (Individual)"].dropna().astype(float).mean() +
+                df_team_founder["1:1's | Purpose (Individual)"].dropna().astype(float).mean()
             ) / 2
 
             fields_individual = fields["individual"]
@@ -262,7 +273,7 @@ with st.container(border=True):
             means_individual_total = []
 
             for field in fields_individual:
-                mean_individual = df_team_startup_founder[field].dropna().astype(float).mean()
+                mean_individual = df_team_founder[field].dropna().astype(float).mean()
                 means_individual.append(mean_individual)
                 mean_individual_total = df_team[field].dropna().astype(float).mean()
                 means_individual_total.append(mean_individual_total)
@@ -308,15 +319,15 @@ with st.container(border=True):
             #vamos a intentar poner las metricas
 
             number_greens = (
-                df_team_startup_founder[df_team_startup_founder['Talks | Unconventional thinking (Individual)'] == 'Bonus star']['Talks | Unconventional thinking (Individual)'].count() +
-                df_team_startup_founder[df_team_startup_founder['Workstations | Unconventional thinking (Individual)'] == 'Bonus star']['Workstations | Unconventional thinking (Individual)'].count() +
-                df_team_startup_founder[df_team_startup_founder['Founder arena | Unconventional thinking (Individual)'] == 'Bonus star']['Founder arena | Unconventional thinking (Individual)'].count()
+                df_team_founder[df_team_founder['Talks | Unconventional thinking (Individual)'] == 'Bonus star']['Talks | Unconventional thinking (Individual)'].count() +
+                df_team_founder[df_team_founder['Workstations | Unconventional thinking (Individual)'] == 'Bonus star']['Workstations | Unconventional thinking (Individual)'].count() +
+                df_team_founder[df_team_founder['Founder arena | Unconventional thinking (Individual)'] == 'Bonus star']['Founder arena | Unconventional thinking (Individual)'].count()
             )
 
             number_reds = (
-                df_team_startup_founder[df_team_startup_founder['Talks | Unconventional thinking (Individual)'] == 'Red flag']['Talks | Unconventional thinking (Individual)'].count() +
-                df_team_startup_founder[df_team_startup_founder['Workstations | Unconventional thinking (Individual)'] == 'Red flag']['Workstations | Unconventional thinking (Individual)'].count() +
-                df_team_startup_founder[df_team_startup_founder['Founder arena | Unconventional thinking (Individual)'] == 'Red flag']['Founder arena | Unconventional thinking (Individual)'].count()
+                df_team_founder[df_team_founder['Talks | Unconventional thinking (Individual)'] == 'Red flag']['Talks | Unconventional thinking (Individual)'].count() +
+                df_team_founder[df_team_founder['Workstations | Unconventional thinking (Individual)'] == 'Red flag']['Workstations | Unconventional thinking (Individual)'].count() +
+                df_team_founder[df_team_founder['Founder arena | Unconventional thinking (Individual)'] == 'Red flag']['Founder arena | Unconventional thinking (Individual)'].count()
             )
 
             subcols= st.columns(3)
