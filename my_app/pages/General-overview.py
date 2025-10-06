@@ -98,6 +98,11 @@ expected_fields = [
     "Talks | Unconventional thinking (Individual)",
     "Workstations | Unconventional thinking (Individual)",
     "Founder arena | Unconventional thinking (Individual)",
+    "Workstations | Openness (Individual)",
+    "Paellas contest | Openness (Individual)",
+    "Workstations | Purpose (Individual)",
+    "1:1's | Purpose (Individual)"
+
     ]
 
 for col in expected_fields:
