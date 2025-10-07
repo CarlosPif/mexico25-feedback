@@ -430,8 +430,34 @@ with st.container(border=True):
             continue
         else:
             st.markdown(f"""
-            <p style="color: {color};">{labels_risk[i]}:</p>
-            <p>{explanation}</p>
+            <p style="color: {color};">{labels_risk[i]}<span style="color: black;">{[df_em_startup_em[field].item() if not df_em_startup_em[field].empty else ""]}</span>: 
+            <span style="color: black;">{explanation}</span></p>
+            """, unsafe_allow_html=True)
+
+    for i, field in enumerate(fields_reward):
+        if not df_em_startup_em[risk_reward_fields["reward_flags"][i]].empty:
+            flag = df_em_startup_em[risk_reward_fields["reward_flags"][i]].item()
+        else:
+            flag = np.nan
+
+        if flag == "🟢 Green flag":
+            color = "green"
+        elif flag == "🔴 Red flag":
+            color = "red"
+        else:
+            color = "orange"
+        
+        if not df_em_startup_em[risk_reward_fields["reward_exp"][i]].empty:
+            explanation = df_em_startup_em[risk_reward_fields["reward_exp"][i]].item()
+        else:
+            explanation = np.nan
+        
+        if experience_maker == "---":
+            continue
+        else:
+            st.markdown(f"""
+            <p style="color: {color};">{labels_reward[i]}<span style="color: black;">{[df_em_startup_em[field].item() if not df_em_startup_em[field].empty else ""]}</span>: 
+            <span style="color: black;">{explanation}</span></p>
             """, unsafe_allow_html=True)
 
 #=========================Grafico de Arañaaa===========================
