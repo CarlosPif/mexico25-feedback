@@ -94,15 +94,53 @@ fields = {
     ]
 }
 
+risk_reward_fields = {
+    "risk_scores": [
+        "RISK | State of development_Score",
+        "RISK | Momentum_Score",
+        "RISK | Management_Score"
+    ],
+    "risk_flags": [
+        "RISK | State of development_Flag",
+        "RISK | Momentum_Flag",
+        "RISK | Management_Flag"
+    ],
+    "risk_exp": [
+        "RISK | State of development_exp",
+        "RISK | Momentum_exp",
+        "RISK | Management_exp",
+    ],
+    "reward_scores": [
+        "Reward | Market_Score",
+        "Reward | Team_Score",
+        "Reward | Pain_Score",
+        "Reward | Scalability_Score"
+    ],
+    "reward_flags": [
+        "Reward | Market_Flag",
+        "Reward | Team_Flag",
+        "Reward | Pain_Flag",
+        "Reward | Scalability_Flag"
+    ],
+    "reward_exp": [
+        "Reward | Market_exp",
+        "Reward | Team_exp",
+        "Reward | Pain_exp",
+        "Reward | Scalability_exp"
+    ]
+}
+
 expected_fields = [
+    "Startup",
     "Talks | Unconventional thinking (Individual)",
     "Workstations | Unconventional thinking (Individual)",
     "Founder arena | Unconventional thinking (Individual)",
     "Workstations | Openness (Individual)",
     "Paellas contest | Openness (Individual)",
     "Workstations | Purpose (Individual)",
-    "1:1's | Purpose (Individual)"
-
+    "1:1's | Purpose (Individual)",
+    "Workstations | Challenge clearness (Bussiness)",
+    "Workstations | Challenge importance (Bussiness)"
     ]
 
 for col in expected_fields:
@@ -116,6 +154,17 @@ for col in fields['team']:
 for col in fields['individual']:
     if col not in df_team.columns:
         df_team[col] = np.nan
+
+for keys in risk_reward_fields.keys():
+    for col in risk_reward_fields[keys]:
+        if col not in df_em.columns:
+            df_em[col] = np.nan
+
+if "Startup" not in df_em.columns:
+    df_em["Startup"] = np.nan
+
+if "EM_Name" not in df_em.columns:
+    df_em["EM_Name"] = np.nan
 
 labels = {
     "team": [
@@ -137,6 +186,17 @@ labels = {
         "Management of emotions",
         "Openness",
         "Purpose"
+    ],
+    "risk": [
+        "State of development",
+        "Momentum",
+        "Management"
+    ],
+    "reward": [
+        "Market",
+        "Team",
+        "Pain",
+        "Scalability"
     ]
 }
 #==========================================================
@@ -192,8 +252,187 @@ unsafe_allow_html=True)
 startup = st.selectbox("Select a startup", startups)
 
 df_team_startup = df_team[df_team["Startup"] == startup]
+df_em_startup = df_em[df_em["Startup"] == startup]
 
-#--------------------------Parte de business metrics--------------------
+#--------------------------Parte de business metrics--------------------hacer ahoraaaaaaaaa
+
+fields_risk = risk_reward_fields["risk_scores"]
+fields_reward = risk_reward_fields["reward_scores"]
+fields_workstations = ["Workstations | Challenge clearness (Bussiness)", "Workstations | Challenge importance (Bussiness)"]
+means_risk = []
+means_risk_total = []
+means_reward = []
+means_reward_total = []
+means_workstations = []
+means_workstations_total = []
+
+for field in fields_risk:
+    mean_risk = df_em_startup[field].dropna().astype(float).mean()
+    means_risk.append(mean_risk)
+    mean_risk_total = df_em[field].dropna().astype(float).mean()
+    means_risk_total.append(mean_risk_total)
+
+for field in fields_reward:
+    mean_reward = df_em_startup[field].dropna().astype(float).mean()
+    means_reward.append(mean_reward)
+    mean_reward_total = df_em[field].dropna().astype(float).mean()
+    means_reward_total.append(mean_reward_total)
+
+for field in fields_workstations:
+    mean_workstations = df_team_startup[field].dropna().astype(float).mean()
+    means_workstations.append(mean_workstations)
+    mean_workstations_total = df_team[field].dropna().astype(float).mean()
+    means_workstations_total.append(mean_workstations_total)
+
+means_risk.append(means_risk[0])
+means_risk_total.append(means_risk_total[0])
+means_reward.append(means_reward[0])
+means_reward_total.append(means_reward_total[0])
+means_workstations.append(means_workstations[0])
+means_workstations_total.append(means_workstations_total[0])
+
+labels_risk = labels["risk"]
+labels_risk.append(labels_risk[0])
+labels_reward = labels["reward"]
+labels_reward.append(labels_reward[0])
+labels_workstations = ["Challenge clearness", "Challenge importance"]
+labels_workstations.append(labels_workstations[0])
+
+with st.container(border=True):
+    st.markdown("""
+    <h5>Business Metrics</h5>
+    """,
+    unsafe_allow_html=True)
+
+    cols = st.columns(3)
+    with cols[0]:
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatterpolar(
+            name="All",
+            r=means_risk_total,
+            theta=labels_risk,
+            line=dict(color='rgb(255, 185, 80)')
+        ))
+
+        fig.add_trace(go.Scatterpolar(
+            name="Startup",
+            r=means_risk,
+            theta=labels_risk,
+            fill='toself',
+            fillcolor='rgba(47, 208, 239, 0.4)',
+            line=dict(color='rgb(47, 208, 239)')
+        ))
+
+        fig.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                    visible=True,
+                    range=[0, 5]
+                    )),
+                height=375,
+                width=375,
+                title='Risk metrics'
+            )
+
+        st.plotly_chart(fig)
+
+    with cols[1]:
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatterpolar(
+            name="All",
+            r=means_reward_total,
+            theta=labels_reward,
+            line=dict(color='rgb(255, 185, 80)')
+        ))
+
+        fig.add_trace(go.Scatterpolar(
+            name="Startup",
+            r=means_reward,
+            theta=labels_reward,
+            fill='toself',
+            fillcolor='rgba(47, 208, 239, 0.4)',
+            line=dict(color='rgb(47, 208, 239)')
+        ))
+
+        fig.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                    visible=True,
+                    range=[0, 5]
+                    )),
+                height=375,
+                width=375,
+                title='Reward metrics'
+            )
+
+        st.plotly_chart(fig)
+
+    with cols[2]:
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatterpolar(
+            name="All",
+            r=means_workstations_total,
+            theta=labels_workstations,
+            line=dict(color='rgb(255, 185, 80)')
+        ))
+
+        fig.add_trace(go.Scatterpolar(
+            name="Startup",
+            r=means_workstations,
+            theta=labels_workstations,
+            fill='toself',
+            fillcolor='rgba(47, 208, 239, 0.4)',
+            line=dict(color='rgb(47, 208, 239)')
+        ))
+
+        fig.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                    visible=True,
+                    range=[0, 5]
+                    )),
+                height=375,
+                width=375,
+                title='Workstations metrics'
+            )
+
+        st.plotly_chart(fig)
+    
+    if not df_em_startup["EM_Name"].empty:
+        em_list = ["---"] + df_em_startup["EM_Name"].tolist()
+    else:
+        em_list = ["---"]
+    experience_maker = st.selectbox("Experience Maker Feedback", em_list, index=0)
+    df_em_startup_em = df_em_startup[df_em_startup["EM_Name"] == experience_maker]
+    
+    for i, field in enumerate(fields_risk):
+        if not df_em_startup_em[risk_reward_fields["risk_flags"][i]].empty:
+            flag = df_em_startup_em[risk_reward_fields["risk_flags"][i]].item()
+        else:
+            flag = np.nan
+
+        if flag == "🟢 Green flag":
+            color = "green"
+        elif flag == "🔴 Red flag":
+            color = "red"
+        else:
+            color = "orange"
+        
+        if not df_em_startup_em[risk_reward_fields["risk_exp"][i]].empty:
+            explanation = df_em_startup_em[risk_reward_fields["risk_exp"][i]].item()
+        else:
+            explanation = np.nan
+        
+        if experience_maker == "---":
+            continue
+        else:
+            st.markdown(f"""
+            <p style="color: {color};">{labels_risk[i]}:</p>
+            <p>{explanation}</p>
+            """, unsafe_allow_html=True)
 
 #=========================Grafico de Arañaaa===========================
 fields_team = fields['team']
