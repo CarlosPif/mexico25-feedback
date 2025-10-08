@@ -1,7 +1,7 @@
 from pyairtable import Api
 import pandas as pd
 import streamlit as st
-
+import plotly.graph_objects as go
 api_key = st.secrets["airtable"]["api_key"]
 base_id = st.secrets["airtable"]["base_id"]
 
@@ -115,34 +115,22 @@ text-align: center;
 <h5>Risk - Reward Matrix</h5>
 """, unsafe_allow_html=True)
 
-import pandas as pd
-import plotly.graph_objects as go
-import numpy as np
-# Asume que 'df_em' y 'risk_reward_fields' ya están definidos como en tu script
+#vamos a darle la vuelta a risk 
 
-# El nombre real de tu columna de startups (ajústalo si es necesario)
-COLUMNA_STARTUP = "Startup" 
+df_em[risk_reward_fields["risk_scores"]] = 5 - df_em[risk_reward_fields["risk_scores"]]
 
-# 1. Define la función de agregación
-def calcular_medias_por_grupo(grupo):
-    # Calcula la media para la categoría 'riesgo'
-    media_riesgo = grupo[risk_reward_fields["risk_scores"]].stack().mean()
-    
-    # Calcula la media para la categoría 'recompensa'
-    media_recompensa = grupo[risk_reward_fields["reward_scores"]].stack().mean()
-    
-    # Devuelve los resultados como una Serie
+#vamosa calcular un par de medias
+
+def grouped_means(df):
+    risk_mean = df[risk_reward_fields["risk_scores"]].stack().mean()
+    reward_mean = df[risk_reward_fields["reward_scores"]].stack().mean()
+
     return pd.Series({
-        'risk_mean': media_riesgo,
-        'reward_mean': media_recompensa
+        "risk_mean": risk_mean,
+        "reward_mean": reward_mean
     })
 
-# 2. Aplica la función al grupo
-df_em_means = df_em.groupby(COLUMNA_STARTUP).apply(calcular_medias_por_grupo).reset_index()
-
-
-# 3. El código para graficar ahora funciona perfectamente
-st.markdown("<h5>Risk - Reward Matrix</h5>", unsafe_allow_html=True)
+df_em_means = df_em.groupby("Startup").apply(grouped_means).reset_index()
 
 fig = go.Figure()
 
@@ -150,7 +138,7 @@ fig.add_trace(go.Scatter(
     x=df_em_means["risk_mean"],
     y=df_em_means["reward_mean"],
     mode='markers+text',
-    text=df_em_means[COLUMNA_STARTUP],
+    text=df_em_means["Startup"],
     textposition="top center",
     marker=dict(
         size=10,
