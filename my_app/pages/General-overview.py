@@ -54,7 +54,7 @@ startup_founders = {
     "Ecosis": ["Enrique Arredondo", "Roberto Riveroll"],
     "CALMIO": ["Andrés Ospina", "Camilo Ospina"],
     "Pitz": ["Natalia Salcedo"],
-    "BondUp": ["Michelle Schintzer"],
+    "BondUP": ["Michelle Schnitzer"],
     "Jelt": ["Sergio Ramirez"],
     "Moabits SL": ["Alejandro Ortiz", "David Santibanez", "Juan Martin Pawluszek"],
     "Ximple": ["Daniel Sujo", "Joao Ramos"],
