@@ -347,7 +347,7 @@ with st.container(border=True):
 
         cols_2 = st.columns(10)
         with cols_2[4]:
-            st.metric(label="mean", value=round(fields_mean_risk, 2), delta=round(fields_mean_risk_total - fields_mean_risk, 2))
+            st.metric(label="mean", value=round(fields_mean_risk, 2), delta=round(fields_mean_risk - fields_mean_risk_total, 2))
 
     with cols[1]:
         fig = go.Figure()
@@ -383,7 +383,7 @@ with st.container(border=True):
 
         cols_2 = st.columns(10)
         with cols_2[4]:
-            st.metric(label="mean", value=round(fields_mean_reward, 2), delta=round(fields_mean_reward_total - fields_mean_reward, 2))
+            st.metric(label="mean", value=round(fields_mean_reward, 2), delta=round(fields_mean_reward - fields_mean_reward_total, 2))
 
     with cols[2]:
         fig = go.Figure()
@@ -418,7 +418,7 @@ with st.container(border=True):
         st.plotly_chart(fig)
         cols_2 = st.columns(10)
         with cols_2[4]:
-            st.metric(label="mean", value=round(fields_mean_workstations, 2), delta=round(fields_mean_workstations_total - fields_mean_workstations, 2))
+            st.metric(label="mean", value=round(fields_mean_workstations, 2), delta=round(fields_mean_workstations - fields_mean_workstations_total, 2))
     
     if not df_em_startup["EM_Name"].empty:
         em_list = ["---"] + df_em_startup["EM_Name"].tolist()
