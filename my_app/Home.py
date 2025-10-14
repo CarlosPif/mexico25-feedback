@@ -1,3 +1,4 @@
+import numpy as np
 from pyairtable import Api
 import pandas as pd
 import streamlit as st
@@ -107,6 +108,35 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+.outer-container {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    width: 100%; /* Ocupa todo el ancho disponible */
+}
+.container {
+    display: flex;
+    align-items: center;
+}
+.logo-img {
+    width: 80px;
+    height: 80px;
+    margin-right: 20px;
+}
+.title-text {
+    font-size: 2.5em; /* Tamaño del título */
+    font-weight: bold;
+}
+</style>
+<div class="outer-container">
+<div class="container">
+    <img class="logo-img" src="https://images.squarespace-cdn.com/content/v1/67811e8fe702fd5553c65249/c5500619-9712-4b9b-83ee-a697212735ae/Disen%CC%83o+sin+ti%CC%81tulo+%2840%29.png">
+    <h1 class="title-text">Program Feedback<br>México 2025</h1>
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<style>
 h5 {
 text-align: center;
 }
@@ -131,6 +161,7 @@ def grouped_means(df):
     })
 
 df_em_means = df_em.groupby("Startup").apply(grouped_means).reset_index()
+df_em_means["Distance"] = np.sqrt((4 - df_em_means["risk_mean"]) ** 2 + (4 - df_em_means["reward_mean"]) ** 2)
 
 fig = go.Figure()
 
@@ -143,9 +174,10 @@ fig.add_trace(go.Scatter(
     marker=dict(
         size=10,
         color=df_em_means["risk_mean"],
-        colorscale='Viridis',
+        colorscale='RdYlGn_r',
         showscale=True
     )
 ))
 
 st.plotly_chart(fig)
+
