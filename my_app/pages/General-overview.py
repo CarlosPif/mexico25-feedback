@@ -47,10 +47,9 @@ st.set_page_config(
 
 #==================CONFIG==============================
 startup_founders = {
-    "ROOK": ["Marco Benitez", "Jonas Ducker", "Daniel Martínez"],
+    "ROOK": ["Marco Benitez", "Jonas Ducker", "Daniel Martinez"],
     "Figuro": ["Juan Camilo Gonzalez"],
     "Admina": ["David Gomez", "Andres Gomez"],
-    "Thalla": ["Samuel Gomez", "Daniel Salinas"],
     "Ecosis": ["Enrique Arredondo", "Roberto Riveroll"],
     "CALMIO": ["Andrés Ospina", "Camilo Ospina"],
     "Pitz": ["Natalia Salcedo"],
@@ -166,8 +165,6 @@ if "Startup" not in df_em.columns:
 if "EM_Name" not in df_em.columns:
     df_em["EM_Name"] = np.nan
 
-df_olbi = df_olbi[df_olbi["Startup Name"].isin(startup_founders.keys())]
-
 labels = {
     "team": [
         "Conflict resolution",
@@ -274,17 +271,26 @@ for field in fields_risk:
     mean_risk_total = df_em[field].dropna().astype(float).mean()
     means_risk_total.append(mean_risk_total)
 
+fields_mean_risk = statistics.mean(means_risk)
+fields_mean_risk_total = statistics.mean(means_risk_total)
+
 for field in fields_reward:
     mean_reward = df_em_startup[field].dropna().astype(float).mean()
     means_reward.append(mean_reward)
     mean_reward_total = df_em[field].dropna().astype(float).mean()
     means_reward_total.append(mean_reward_total)
 
+fields_mean_reward = statistics.mean(means_reward)
+fields_mean_reward_total = statistics.mean(means_reward_total)
+
 for field in fields_workstations:
     mean_workstations = df_team_startup[field].dropna().astype(float).mean()
     means_workstations.append(mean_workstations)
     mean_workstations_total = df_team[field].dropna().astype(float).mean()
     means_workstations_total.append(mean_workstations_total)
+
+fields_mean_workstations = statistics.mean(means_workstations)
+fields_mean_workstations_total = statistics.mean(means_workstations_total)
 
 means_risk.append(means_risk[0])
 means_risk_total.append(means_risk_total[0])
@@ -330,7 +336,7 @@ with st.container(border=True):
                 polar=dict(
                     radialaxis=dict(
                     visible=True,
-                    range=[0, 5]
+                    range=[0, 4]
                     )),
                 height=375,
                 width=375,
@@ -338,6 +344,10 @@ with st.container(border=True):
             )
 
         st.plotly_chart(fig)
+
+        cols_2 = st.columns(10)
+        with cols_2[4]:
+            st.metric(label="mean", value=round(fields_mean_risk, 2), delta=round(fields_mean_risk_total - fields_mean_risk, 2))
 
     with cols[1]:
         fig = go.Figure()
@@ -362,7 +372,7 @@ with st.container(border=True):
                 polar=dict(
                     radialaxis=dict(
                     visible=True,
-                    range=[0, 5]
+                    range=[0, 4]
                     )),
                 height=375,
                 width=375,
@@ -370,6 +380,10 @@ with st.container(border=True):
             )
 
         st.plotly_chart(fig)
+
+        cols_2 = st.columns(10)
+        with cols_2[4]:
+            st.metric(label="mean", value=round(fields_mean_reward, 2), delta=round(fields_mean_reward_total - fields_mean_reward, 2))
 
     with cols[2]:
         fig = go.Figure()
@@ -394,7 +408,7 @@ with st.container(border=True):
                 polar=dict(
                     radialaxis=dict(
                     visible=True,
-                    range=[0, 5]
+                    range=[0, 4]
                     )),
                 height=375,
                 width=375,
@@ -402,6 +416,9 @@ with st.container(border=True):
             )
 
         st.plotly_chart(fig)
+        cols_2 = st.columns(10)
+        with cols_2[4]:
+            st.metric(label="mean", value=round(fields_mean_workstations, 2), delta=round(fields_mean_workstations_total - fields_mean_workstations, 2))
     
     if not df_em_startup["EM_Name"].empty:
         em_list = ["---"] + df_em_startup["EM_Name"].tolist()
@@ -473,6 +490,8 @@ for field in fields_team:
     mean_total = df_team[field].dropna().astype(float).mean()
     means_team_total.append(mean_total)
 
+fields_mean_team = statistics.mean(means_team)
+fields_mean_team_total = statistics.mean(means_team_total)
 
 means_team_total.append(means_team_total[0])
 means_team.append(means_team[0])
@@ -502,13 +521,18 @@ fig.update_layout(
   polar=dict(
     radialaxis=dict(
       visible=True,
-      range=[0, 5]
+      range=[0, 4]
     ))
 )
 
 with st.container(border=True):
     st.markdown(f"<h5>Team DD for {startup}</h5>", unsafe_allow_html=True)
     st.plotly_chart(fig, use_container_width=True)
+
+    cols = st.columns(20)
+    with cols[9]:
+        st.metric(label="Team mean", value=round(fields_mean_team, 2), delta=round(fields_mean_team_total - fields_mean_team, 2))
+
 
 #=========================Parte de Individual=================================
 
@@ -527,20 +551,17 @@ with st.container(border=True):
     ) / 2
 
     cols = st.columns(len(founders))
+    openness_cols = ["Workstations | Openness (Individual)", "Paellas contest | Openness (Individual)"]
+    purpose_cols = ["Workstations | Purpose (Individual)", "1:1's | Purpose (Individual)"]
+    for col in openness_cols + purpose_cols:
+        df_team[col] = pd.to_numeric(df_team[col], errors='coerce')
+
+    df_team["Openness"] = df_team[openness_cols].mean(axis=1)
+    df_team["Purpose"] = df_team[purpose_cols].mean(axis=1)
 
     for i, founder in enumerate(founders):
         with cols[i]:
             df_team_founder = df_team[df_team["Founder_str"].str.replace(" ", "").str.lower() == founders_clean[i]].copy()
-            df_team_founder["Openness"] = (
-                df_team_founder["Workstations | Openness (Individual)"].dropna().astype(float).mean() +
-                df_team_founder["Paellas contest | Openness (Individual)"].dropna().astype(float).mean()
-            ) / 2
-
-            df_team_founder["Purpose"] = (
-                df_team_founder["Workstations | Purpose (Individual)"].dropna().astype(float).mean() +
-                df_team_founder["1:1's | Purpose (Individual)"].dropna().astype(float).mean()
-            ) / 2
-
             fields_individual = fields["individual"]
             means_individual = []
             means_individual_total = []
@@ -581,7 +602,7 @@ with st.container(border=True):
                 polar=dict(
                     radialaxis=dict(
                     visible=True,
-                    range=[0, 5]
+                    range=[0, 4]
                     )),
                 height=375,
                 width=375,
@@ -622,53 +643,61 @@ with st.container(border=True):
         df_olbi["OLBI_Total_Score"].mean()
     ) / 3
 
-    df_olbi_startup = df_olbi[df_olbi["Startup Name"] == startup].copy()
-    olbi_average = df_olbi_startup[["BRS_Total_Score", "GRIT_Total_Score", "OLBI_Total_Score"]].mean().mean()
+    for i, founder in enumerate(founders_clean):
+        df_olbi_founder = df_olbi[df_olbi["Founder--Select"].str.replace(" ", "").str.lower() == founder].copy()
+        olbi_average = df_olbi_founder[["BRS_Total_Score", "GRIT_Total_Score", "OLBI_Total_Score"]].mean().mean()
 
-    cols = st.columns(3)
-    with cols[1]:
-        st.metric(label="Human DD Average", value=round(olbi_average, 2), delta=round(olbi_average - olbi_total_average, 2))
+        if not df_olbi_founder.empty:
+            st.markdown(f"{founders[i]}")
 
-    st.markdown(f"""
-    <style>
-    /* Contenedor principal para la fila de métricas */
-    .metric-row {{
-        display: flex;
-        justify-content: space-between;
-        gap: 15px; /* Espacio entre las cajas */
-    }}
 
-    /* Estilo para la etiqueta (el título de la métrica) */
-    .metric-label {{
-        font-size: 16px;
-        color: #555;
-        margin-bottom: 5px;
-    }}
+            cols = st.columns(3)
+            with cols[2]:
+                st.metric(label="Human DD Average", value=round(olbi_average, 2), delta=round(olbi_average - olbi_total_average, 2))
 
-    /* Estilo para el valor (el número o texto principal) */
-    .metric-value {{
-        font-size: 20px; /* <-- ¡CAMBIA ESTE VALOR PARA AJUSTAR EL TAMAÑO! */
-        font-weight: bold;
-        color: #1E293B;
-    }}
-    </style>
+            with cols[0]:
+                st.markdown(f"""
+                <style>
+                /* Contenedor principal para la fila de métricas */
+                .metric-row {{
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 15px; /* Espacio entre las cajas */
+                }}
 
-    <div class="metric-row">
-        <div class="metric-box">
-            <div class="metric-label">BRS</div>
-            <div class="metric-value">{df_olbi_startup["BRS_Calculation"].iloc[0]}</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">GRIT</div>
-            <div class="metric-value">{df_olbi_startup["GRIT_Calculation"].iloc[0]}</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">OLBI Exhaustion</div>
-            <div class="metric-value">{df_olbi_startup["OLBI_Exhaustion_Descriptor"].iloc[0]}</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">OLBI Disengagement</div>
-            <div class="metric-value">{df_olbi_startup["OLBI_Disengagement_Descriptor"].iloc[0]}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+                /* Estilo para la etiqueta (el título de la métrica) */
+                .metric-label {{
+                    font-size: 16px;
+                    color: #555;
+                    margin-bottom: 5px;
+                }}
+
+                /* Estilo para el valor (el número o texto principal) */
+                .metric-value {{
+                    font-size: 20px; /* <-- ¡CAMBIA ESTE VALOR PARA AJUSTAR EL TAMAÑO! */
+                    font-weight: bold;
+                    color: #1E293B;
+                }}
+                </style>
+
+                <div class="metric-row">
+                    <div class="metric-box">
+                        <div class="metric-label">BRS</div>
+                        <div class="metric-value">{df_olbi_founder["BRS_Calculation"].iloc[0]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">GRIT</div>
+                        <div class="metric-value">{df_olbi_founder["GRIT_Calculation"].iloc[0]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">OLBI Exhaustion</div>
+                        <div class="metric-value">{df_olbi_founder["OLBI_Exhaustion_Descriptor"].iloc[0]}</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">OLBI Disengagement</div>
+                        <div class="metric-value">{df_olbi_founder["OLBI_Disengagement_Descriptor"].iloc[0]}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            continue
