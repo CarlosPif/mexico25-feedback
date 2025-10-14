@@ -175,9 +175,18 @@ fig.add_trace(go.Scatter(
         size=10,
         color=df_em_means["risk_mean"],
         colorscale='RdYlGn_r',
-        showscale=True
+        showscale=True,
+        colorbar=dict(
+            title="Distance to (risk=0, reward=4)"
+        )
     )
 ))
 
+fig.update_layout(
+    xaxis_title='Risk mean',
+    yaxis_title='Reward mean'
+)
+
 st.plotly_chart(fig)
 
+df_em_ordered = df_mem_means.sort_values(by="Distance", ascending=False)
