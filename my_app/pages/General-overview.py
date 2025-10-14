@@ -166,6 +166,8 @@ if "Startup" not in df_em.columns:
 if "EM_Name" not in df_em.columns:
     df_em["EM_Name"] = np.nan
 
+df_olbi = df_olbi[df_olbi["Startup Name"].isin(startup_founders.keys())]
+
 labels = {
     "team": [
         "Conflict resolution",
@@ -512,6 +514,7 @@ with st.container(border=True):
 
 with st.container(border=True):
     founders = startup_founders[startup]
+    founders_clean = [founder.replace(" ", "").lower() for founder in startup_founders[startup]]
 
     df_team["Openness"] = (
         df_team["Workstations | Openness (Individual)"].dropna().astype(float).mean() +
@@ -527,7 +530,7 @@ with st.container(border=True):
 
     for i, founder in enumerate(founders):
         with cols[i]:
-            df_team_founder = df_team[df_team["Founder_str"] == founder].copy()
+            df_team_founder = df_team[df_team["Founder_str"].str.replace(" ", "").str.lower() == founders_clean[i]].copy()
             df_team_founder["Openness"] = (
                 df_team_founder["Workstations | Openness (Individual)"].dropna().astype(float).mean() +
                 df_team_founder["Paellas contest | Openness (Individual)"].dropna().astype(float).mean()
