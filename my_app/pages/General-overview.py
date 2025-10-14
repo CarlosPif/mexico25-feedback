@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import statistics
+import math
 
 api_key = st.secrets["airtable"]["api_key"]
 base_id = st.secrets["airtable"]["base_id"]
@@ -572,8 +573,8 @@ with st.container(border=True):
                 mean_individual_total = df_team[field].dropna().astype(float).mean()
                 means_individual_total.append(mean_individual_total)
             
-            founder_mean = statistics.mean(means_individual)
-            all_individual_mean = statistics.mean(means_individual_total)
+            founder_mean = statistics.mean([numero for numero in means_individual if not math.isnan(numero)])
+            all_individual_mean = statistics.mean([numero for numero in means_individual_total if not math.isnan(numero)])
 
             labels_individual_closed = labels["individual"].copy()
             means_individual.append(means_individual[0])
