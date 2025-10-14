@@ -531,7 +531,7 @@ with st.container(border=True):
 
     cols = st.columns(20)
     with cols[9]:
-        st.metric(label="Team mean", value=round(fields_mean_team, 2), delta=round(fields_mean_team_total - fields_mean_team, 2))
+        st.metric(label="Team mean", value=round(fields_mean_team, 2), delta=round(fields_mean_team - fields_mean_team_total, 2))
 
 
 #=========================Parte de Individual=================================
