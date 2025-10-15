@@ -193,10 +193,23 @@ df_em_ordered = df_em_means.sort_values(by="Distance", ascending=True)
 
 for startup in df_em_ordered["Startup"].tolist():
     if startup in startup_founders.keys():
+
+        row = df_team[df_team["Startup"] == startup].iloc[0]
+        logo_data = row.get("original logo")
+        if isinstance(logo_data, list) and len(logo_data) > 0 and 'url' in logo_data[0]:
+            logo_url = logo_data[0]['url']
+        else:
+            logo_url = ""
+
         with st.container(border=True):
+
             st.markdown(f"""
-                <h4><a href="https://mexico25-feedback-m2zfbuktrvtslpcmgfzcad.streamlit.app/General-overview?startup={startup}">{startup}</a></h4>
-                """, unsafe_allow_html=True)
+                <div style="display: flex; align-items: left; margin-left: 0;">
+                    <img src={logo_url} width="50">
+                    <h4 style="margin-left: 10px; font-weight: bold; color: #333;"><a href="https://mexico25-feedback-m2zfbuktrvtslpcmgfzcad.streamlit.app/General-overview?startup={startup}">{startup}</a></h4>
+                </div>
+                """,
+                unsafe_allow_html=True)
             st.metric(label="Distance to (risk=0, reward=4)", value=round(df_em_ordered[df_em_ordered["Startup"] == startup]["Distance"].values[0], 2))
     else:
         continue
