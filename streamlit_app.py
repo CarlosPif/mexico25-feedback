@@ -11,7 +11,7 @@ General-overview = st.Page(
 pg = st.navigation(
     {
         "Menorca 2025": [],
-        "Mexico 2025": [Home, General-overview],
+        "Mexico 2025": [Home: {General-overview}],
     }
 )
 
