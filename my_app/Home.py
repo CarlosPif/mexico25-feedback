@@ -189,6 +189,10 @@ fig.update_layout(
 
 st.plotly_chart(fig)
 
+st.markdown("""
+<h4>Top Companies According to Risk-Reward Matrix</h4>
+""", unsafe_allow_html=True)
+
 df_em_ordered = df_em_means.sort_values(by="Distance", ascending=True)
 
 for startup in df_em_ordered["Startup"].tolist():
