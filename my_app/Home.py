@@ -3,6 +3,7 @@ from pyairtable import Api
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+
 api_key = st.secrets["airtable"]["api_key"]
 base_id = st.secrets["airtable"]["base_id"]
 
@@ -194,7 +195,7 @@ for startup in df_em_ordered["Startup"].tolist():
     if startup in startup_founders.keys():
         with st.container(border=True):
             st.markdown(f"""
-                <h4>{startup}</h4>
+                <h4><a href="https://mexico25-feedback-m2zfbuktrvtslpcmgfzcad.streamlit.app/General-overview?startup={startup}">{startup}</a></h4>
                 """, unsafe_allow_html=True)
             st.metric(label="Distance to (risk=0, reward=4)", value=round(df_em_ordered[df_em_ordered["Startup"] == startup]["Distance"].values[0], 2))
     else:
