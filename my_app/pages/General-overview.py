@@ -253,14 +253,17 @@ unsafe_allow_html=True)
 
 try:
     initial_startup = st.query_params["startup"]
-    if initial_startup not in startups:
+    if initial_startup in startups:
+        initial_company = initial_startup
+    else:
         initial_company = startups[0]
 except KeyError:
     initial_company = startups[0]
 
+default_index = startups.index(initial_company)
 #----------------------------A partir de aqui dropdown de startup--------------------------
 
-startup = st.selectbox("Select a startup", startups)
+startup = st.selectbox("Select a startup", startups, index=default_index)
 
 st.query_params["startup"] = startup
 
