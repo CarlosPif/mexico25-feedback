@@ -645,6 +645,7 @@ with st.container(border=True):
     ) / 3
 
     for i, founder in enumerate(founders_clean):
+        
         df_olbi_founder = df_olbi[df_olbi["Founder--Select"].str.replace(" ", "").str.lower() == founder].copy()
         olbi_average = df_olbi_founder[["BRS_Total_Score", "GRIT_Total_Score", "OLBI_Total_Score"]].mean().mean()
 
