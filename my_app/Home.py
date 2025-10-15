@@ -146,7 +146,7 @@ text-align: center;
 """, unsafe_allow_html=True)
 
 #vamos a darle la vuelta a risk 
-
+df_em = df_em[df_em["Startup"].isin(startup_founders.keys())]
 df_em[risk_reward_fields["risk_scores"]] = 5 - df_em[risk_reward_fields["risk_scores"]]
 
 #vamosa calcular un par de medias
@@ -184,7 +184,26 @@ fig.add_trace(go.Scatter(
 
 fig.update_layout(
     xaxis_title='Risk mean',
-    yaxis_title='Reward mean'
+    yaxis_title='Reward mean',
+    font=dict(
+        family="Arial, sans-serif",
+        size=10,
+        color="black"
+    ),
+    xaxis=dict(
+        showline=True,
+        linewidth=2,
+        linecolor='black',
+        gridcolor='lightgray',
+        range=[df_em_means["risk_mean"].min() - 0.1, df_em_means["risk_mean"].max() + 0.1]
+    ),
+    yaxis=dict(
+        showline=True,
+        linewidth=2,
+        linecolor='black',
+        gridcolor='lightgray',
+        range=[df_em_means["reward_mean"].min() - 0.2, df_em_means["reward_mean"].max() + 0.2]
+    )
 )
 
 st.plotly_chart(fig)
