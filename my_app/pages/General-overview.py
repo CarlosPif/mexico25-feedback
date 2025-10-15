@@ -276,6 +276,12 @@ startup = st.selectbox(
 
 df_team_startup = df_team[df_team["Startup"] == startup]
 df_em_startup = df_em[df_em["Startup"] == startup]
+
+row = df_team_startup.iloc[0]
+logo_data = row.get("original logo")
+if isinstance(logo_data, list) and len(logo_data) > 0 and 'url' in logo_data[0]:
+    logo_url = logo_data[0]['url']
+    st.image(logo_url, width=250)
 #--------------------------Parte de business metrics--------------------hacer ahoraaaaaaaaa
 
 fields_risk = risk_reward_fields["risk_scores"]
