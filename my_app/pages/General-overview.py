@@ -251,21 +251,28 @@ st.markdown("""
 """,
 unsafe_allow_html=True)
 
-try:
-    initial_startup = st.query_params["startup"]
-    if initial_startup in startups:
-        initial_company = initial_startup
-    else:
-        initial_company = startups[0]
-except KeyError:
-    initial_company = startups[0]
+WIDGET_KEY = "startup_selector_state"
 
-default_index = startups.index(initial_company)
+if WIDGET_KEY not in st.session_state:
+    param_from_url = st.query_params.get("startup")
+    
+    if param_from_url and param_from_url in startups:
+        st.session_state[WIDGET_KEY] = param_from_url
+    else:
+        st.session_state[WIDGET_KEY] = startups[0]
+
+def update_state_and_url():
+    st.query_params["startup"] = st.session_state[WIDGET_KEY]
+
 #----------------------------A partir de aqui dropdown de startup--------------------------
 
-startup = st.selectbox("Select a startup", startups, index=default_index)
-
-st.query_params["startup"] = startup
+startup = st.selectbox(
+    "Select a startup",
+    options=startups,
+    key=WIDGET_KEY,
+    index=startups.index(st.session_state[WIDGET_KEY]),
+    on_change=update_state_and_url
+)
 
 df_team_startup = df_team[df_team["Startup"] == startup]
 df_em_startup = df_em[df_em["Startup"] == startup]
