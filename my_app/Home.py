@@ -36,7 +36,6 @@ startup_founders = {
     "ROOK": ["Marco Benitez", "Jonas Ducker", "Daniel Martínez"],
     "Figuro": ["Juan Camilo Gonzalez"],
     "Admina": ["David Gomez", "Andres Gomez"],
-    "Thalla": ["Samuel Gomez", "Daniel Salinas"],
     "Ecosis": ["Enrique Arredondo", "Roberto Riveroll"],
     "CALMIO": ["Andrés Ospina", "Camilo Ospina"],
     "Pitz": ["Natalia Salcedo"],
@@ -161,7 +160,7 @@ def grouped_means(df):
     })
 
 df_em_means = df_em.groupby("Startup").apply(grouped_means).reset_index()
-df_em_means["Distance"] = np.sqrt((4 - df_em_means["risk_mean"]) ** 2 + (4 - df_em_means["reward_mean"]) ** 2)
+df_em_means["Distance"] = np.sqrt((df_em_means["risk_mean"]) ** 2 + (4 - df_em_means["reward_mean"]) ** 2)
 
 fig = go.Figure()
 
@@ -189,4 +188,14 @@ fig.update_layout(
 
 st.plotly_chart(fig)
 
-df_em_ordered = df_mem_means.sort_values(by="Distance", ascending=False)
+df_em_ordered = df_em_means.sort_values(by="Distance", ascending=True)
+
+for startup in df_em_ordered["Startup"].tolist():
+    if startup in startup_founders.keys():
+        with st.container(border=True):
+            st.markdown(f"""
+                <h4>{startup}</h4>
+                """, unsafe_allow_html=True)
+            st.metric(label="Distance to (risk=0, reward=4)", value=round(df_em_ordered[df_em_ordered["Startup"] == startup]["Distance"].values[0], 2))
+    else:
+        continue
