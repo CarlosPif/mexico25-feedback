@@ -90,7 +90,9 @@ fields = {
         "Paellas contest | Flexibility (Individual)",
         "Paellas contest | Self awareness and management of emotions (Individual)",
         "Openness",
-        "Purpose"
+        "Purpose",
+        "Dilema 1", #Confidence
+        "Dilema 2" #Ambition
     ]
 }
 
@@ -185,7 +187,9 @@ labels = {
         "Flexibility",
         "Management of emotions",
         "Openness",
-        "Purpose"
+        "Purpose",
+        "Confidence",
+        "Ambition"
     ],
     "risk": [
         "State of development",
@@ -247,9 +251,18 @@ st.markdown("""
 """,
 unsafe_allow_html=True)
 
+try:
+    initial_startup = st.query_params["startup"]
+    if initial_startup not in startups:
+        initial_company = startups[0]
+except KeyError:
+    initial_company = startups[0]
+
 #----------------------------A partir de aqui dropdown de startup--------------------------
 
 startup = st.selectbox("Select a startup", startups)
+
+st.query_params["startup"] = startup
 
 df_team_startup = df_team[df_team["Startup"] == startup]
 df_em_startup = df_em[df_em["Startup"] == startup]
@@ -534,7 +547,6 @@ with st.container(border=True):
     with cols[9]:
         st.metric(label="Team mean", value=round(fields_mean_team, 2), delta=round(fields_mean_team - fields_mean_team_total, 2))
 
-
 #=========================Parte de Individual=================================
 
 with st.container(border=True):
@@ -635,71 +647,76 @@ with st.container(border=True):
             with subcols[2]:
                 st.metric(label="Red Flags", value=number_reds)
 
-with st.container(border=True):
-    st.markdown("<h5>Human DD Forms</h5>", unsafe_allow_html=True)
+#=========================Parte de Human DD Forms==================================
 
-    olbi_total_average = (
-        df_olbi["BRS_Total_Score"].mean() +
-        df_olbi["GRIT_Total_Score"].mean() +
-        df_olbi["OLBI_Total_Score"].mean()
-    ) / 3
+cleaned_founders_column = df_olbi["Founder--Select"].str.replace(" ", "").str.lower()
+coincidence = cleaned_founders_column.isin(founders_clean)
+if coincidence.any():
+    with st.container(border=True):
+        st.markdown("<h5>Human DD Forms</h5>", unsafe_allow_html=True)
 
-    for i, founder in enumerate(founders_clean):
-        
-        df_olbi_founder = df_olbi[df_olbi["Founder--Select"].str.replace(" ", "").str.lower() == founder].copy()
-        olbi_average = df_olbi_founder[["BRS_Total_Score", "GRIT_Total_Score", "OLBI_Total_Score"]].mean().mean()
+        olbi_total_average = (
+            df_olbi["BRS_Total_Score"].mean() +
+            df_olbi["GRIT_Total_Score"].mean() +
+            df_olbi["OLBI_Total_Score"].mean()
+        ) / 3
 
-        if not df_olbi_founder.empty:
-            st.markdown(f"{founders[i]}")
+        for i, founder in enumerate(founders_clean):
+            
+            df_olbi_founder = df_olbi[df_olbi["Founder--Select"].str.replace(" ", "").str.lower() == founder].copy()
+            olbi_average = df_olbi_founder[["BRS_Total_Score", "GRIT_Total_Score", "OLBI_Total_Score"]].mean().mean()
+
+            if not df_olbi_founder.empty:
+                st.markdown(f"{founders[i]}")
 
 
-            cols = st.columns(3)
-            with cols[2]:
-                st.metric(label="Human DD Average", value=round(olbi_average, 2), delta=round(olbi_average - olbi_total_average, 2))
+                cols = st.columns(3)
+                with cols[2]:
+                    st.metric(label="Human DD Average", value=round(olbi_average, 2), delta=round(olbi_average - olbi_total_average, 2))
 
-            with cols[0]:
-                st.markdown(f"""
-                <style>
-                /* Contenedor principal para la fila de métricas */
-                .metric-row {{
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 15px; /* Espacio entre las cajas */
-                }}
+                with cols[0]:
+                    st.markdown(f"""
+                    <style>
+                    /* Contenedor principal para la fila de métricas */
+                    .metric-row {{
+                        display: flex;
+                        justify-content: space-between;
+                        gap: 15px; /* Espacio entre las cajas */
+                    }}
 
-                /* Estilo para la etiqueta (el título de la métrica) */
-                .metric-label {{
-                    font-size: 16px;
-                    color: #555;
-                    margin-bottom: 5px;
-                }}
+                    /* Estilo para la etiqueta (el título de la métrica) */
+                    .metric-label {{
+                        font-size: 16px;
+                        color: #555;
+                        margin-bottom: 5px;
+                    }}
 
-                /* Estilo para el valor (el número o texto principal) */
-                .metric-value {{
-                    font-size: 20px; /* <-- ¡CAMBIA ESTE VALOR PARA AJUSTAR EL TAMAÑO! */
-                    font-weight: bold;
-                    color: #1E293B;
-                }}
-                </style>
+                    /* Estilo para el valor (el número o texto principal) */
+                    .metric-value {{
+                        font-size: 20px; /* <-- ¡CAMBIA ESTE VALOR PARA AJUSTAR EL TAMAÑO! */
+                        font-weight: bold;
+                        color: #1E293B;
+                    }}
+                    </style>
 
-                <div class="metric-row">
-                    <div class="metric-box">
-                        <div class="metric-label">BRS</div>
-                        <div class="metric-value">{df_olbi_founder["BRS_Calculation"].iloc[0]}</div>
+                    <div class="metric-row">
+                        <div class="metric-box">
+                            <div class="metric-label">BRS</div>
+                            <div class="metric-value">{df_olbi_founder["BRS_Calculation"].iloc[0]}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">GRIT</div>
+                            <div class="metric-value">{df_olbi_founder["GRIT_Calculation"].iloc[0]}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">OLBI Exhaustion</div>
+                            <div class="metric-value">{df_olbi_founder["OLBI_Exhaustion_Descriptor"].iloc[0]}</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">OLBI Disengagement</div>
+                            <div class="metric-value">{df_olbi_founder["OLBI_Disengagement_Descriptor"].iloc[0]}</div>
+                        </div>
                     </div>
-                    <div class="metric-box">
-                        <div class="metric-label">GRIT</div>
-                        <div class="metric-value">{df_olbi_founder["GRIT_Calculation"].iloc[0]}</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-label">OLBI Exhaustion</div>
-                        <div class="metric-value">{df_olbi_founder["OLBI_Exhaustion_Descriptor"].iloc[0]}</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-label">OLBI Disengagement</div>
-                        <div class="metric-value">{df_olbi_founder["OLBI_Disengagement_Descriptor"].iloc[0]}</div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            continue
+                    """, unsafe_allow_html=True)
+            else:
+                continue
