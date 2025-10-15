@@ -67,7 +67,7 @@ startup_founders = {
     "Verticcal": ["Santiago Gallo Restrepo", "Pablo Sanchez Villamarin"],
     "Neat": ["Nicolas Chacon", "Javier Benavides"],
     "CIFRATO": ["Yerson Cacua", "Juan Pisco"],
-    "Konvex": ["Andres Cristobal", "Sosa Tellez"]
+    "Konvex": ["Andres Cristobal Sosa Tellez"]
 }
 
 startups = list(startup_founders.keys())
@@ -269,13 +269,6 @@ st.query_params["startup"] = startup
 
 df_team_startup = df_team[df_team["Startup"] == startup]
 df_em_startup = df_em[df_em["Startup"] == startup]
-
-row = df_team_startup.iloc[0]
-logo_data = row.get("original logo")
-if isinstance(logo_data, list) and len(logo_data) > 0 and "url" in logo_data[0]:
-    logo_url = logo_data[0]["url"]
-
-st.image(logo_url, width=200)
 #--------------------------Parte de business metrics--------------------hacer ahoraaaaaaaaa
 
 fields_risk = risk_reward_fields["risk_scores"]
@@ -594,7 +587,11 @@ with st.container(border=True):
                 mean_individual_total = df_team[field].dropna().astype(float).mean()
                 means_individual_total.append(mean_individual_total)
             
-            founder_mean = statistics.mean([numero for numero in means_individual if not math.isnan(numero)])
+            numbers = [numero for numero in means_individual if not math.isnan(numero)]
+            if numbers:
+                founder_mean = statistics.mean(numbers)
+            else:
+                founder_mean = 0
             all_individual_mean = statistics.mean([numero for numero in means_individual_total if not math.isnan(numero)])
 
             labels_individual_closed = labels["individual"].copy()
